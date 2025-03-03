@@ -1,19 +1,23 @@
 'use client'
 
-import { useState } from 'react'
-import { usePathname } from 'next/navigation'
+import { useParams } from 'next/navigation'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import CategoryNavigation from '@/components/CategoryNavigation'
 import SortControls from '@/components/SortControls'
 import CategorySalesRanking from '@/components/CategorySalesRanking'
-import ProductList from '@/components/ProductList'
-import CategoryBlog from '@/components/CategoryBlog' // ✅ 追加
+import CategoryList from '@/components/CategoryList'
+import CategoryBlog from '@/components/CategoryBlog'
 
 export default function CategoryPage() {
-  const pathname = usePathname()
-  const categorySlug = pathname.split('/').pop() // URLから現在のカテゴリースラッグを取得
-  const [sortType, setSortType] = useState('sales') // 初期値は売上順
+  const { category } = useParams() // ✅ URLの動的パラメータを取得
+  console.log('🛠️ 現在のカテゴリースラッグ:', category)
+
+  if (!category) {
+    return (
+      <p className="text-center text-red-500">カテゴリーが見つかりません</p>
+    )
+  }
 
   return (
     <div className="bg-[#F5F5DC] text-gray-900">
@@ -21,19 +25,19 @@ export default function CategoryPage() {
       <Header />
 
       <main className="container mx-auto px-4 py-8 space-y-12">
-        {/* 📂 カテゴリーナビゲーション */}
+        {/* 📂 カテゴリーナビゲーション (楽天APIから動的取得) */}
         <CategoryNavigation />
 
         {/* 🔄 並び替え機能 */}
-        <SortControls onSortChange={setSortType} />
+        <SortControls />
 
         {/* 🏆 カテゴリーごとの売上ランキング */}
-        <CategorySalesRanking />
+        <CategorySalesRanking category={category} />
 
-        {/* 📦 商品リスト */}
-        <ProductList sortType={sortType} />
+        {/* 📦 商品リスト（楽天API対応） */}
+        <CategoryList category={category} sortType="sales" page={1} />
 
-        {/* 📝 関連ブログ記事 ✅ 追加 */}
+        {/* 📝 関連ブログ記事 */}
         <CategoryBlog />
       </main>
 
